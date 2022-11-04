@@ -6,7 +6,7 @@ exports.createUser = async (req, res) => {
     try {
         const newUser = await User.create(req.body);
         const token = await jwt.sign({_id: newUser._id}, process.env.SECRET);
-        res.status(201).send({user: "user has been created", token});
+        res.status(201).send({username: newUser.username, token});
     } catch (error) {
         console.log(error)
         res.status(500).send({error: error.message})
@@ -30,7 +30,7 @@ exports.updateUser = async (req, res) => {
             {username: req.body.username},
             {[req.body.key]: req.body.value}
         );
-        res.status(200).send({message: "successfully update a user"})
+        res.status(200).send({message: "user feild as been updated"})
 
     } catch (error) {
         console.log(error)
@@ -40,9 +40,8 @@ exports.updateUser = async (req, res) => {
 }
 
 exports.deleteUser = async (req, res) => {
-    console.log(req.params)
     try {
-        await User.deleteOne({username: req.params.username});
+        await User.deleteOne({username: req.body.username});
         res.status(200).send({message: "successfully deleted a user"})
     } catch (error) {
         console.log(error)
@@ -50,19 +49,21 @@ exports.deleteUser = async (req, res) => {
     }
 }
 
-exports.loginUser = async (req, res) => {
+exports.loginUser = async(req, res) => {
     try {
-// TASK is to generate a token on createuser and loginuser. This token should include unique information from the db entry. The token needs to sent back in the response and have an an endpoint that will find the user given just the token.
-        const token = await jwt.sign({_id: req.user._id}, process.env.SECRET);
-        res.status(200).send({user: req.user.username, token, text: "Sucessfully logged in"})
+        if (req.user) {
+            res.status(200).send({username: req.user.username})
+        } else{
+            const user = await User.findByCredentials(
+                req.body.username,
+                req.body.password
+            )
+            console.log(user)
+            const token = await jwt.sign({_id: user._id}, process.env.SECRET)
+            res.status(200).send({username: user.username, token, text: "successfully logged in"})
+        }
     } catch (error) {
         console.log(error)
         res.status(500).send({error: error.message})
     }
 }
-// TODO: add updateUser and deleteUser controllers here
-
-
-
-
-

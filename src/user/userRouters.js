@@ -6,10 +6,9 @@ const userRouter = Router()
 
 userRouter.get("/readUser", readUsers);
 userRouter.post("/createUser", hashPass, createUser);
-userRouter.post("/loginUser",comparePass, loginUser)
-userRouter.get("/loginUser",tokenCheck, loginUser)
+userRouter.post("/loginUser", tokenCheck, loginUser)
 userRouter.put("/updateUser", updateUser );
-userRouter.delete("/deleteUser/:username", deleteUser);
+userRouter.delete("/deleteUser", deleteUser);
 //TODO: Add update and delete routes here. 
 
 module.exports = userRouter
